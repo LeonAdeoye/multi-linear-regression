@@ -1,9 +1,7 @@
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn import metrics
+import numpy as np
+from sklearn.linear_model import LinearRegression
 
 
 def read_data():
@@ -12,8 +10,23 @@ def read_data():
     insurance_dataFrame = pd.read_csv("../data/insurance.csv", sep=',')
     print(f"Head after read:\n{insurance_dataFrame.head()}")
     print(f"Shape:\n{insurance_dataFrame.shape}")
-    insurance_dataFrame["charges"].hist(bins=10)
+
+    # group by diagnosis - this returns groupby object.
+    regions_groupby = insurance_dataFrame.groupby(by=["region"])
+    # Use size to get the count
+    print(f"Count of regions:\n {regions_groupby.size()}")
+
+    correlation_matrix = insurance_dataFrame.corr()
+    print(f"Shape:\n{correlation_matrix}")
+
+    # Display histogram of charges
+    insurance_dataFrame["charges"].hist(bins=13)
     plt.show()
+
+    x = []
+    y = []
+    model = LinearRegression()
+    model = LinearRegression().fit(x, y)
 
 
 def normalize(df):
@@ -25,6 +38,7 @@ def normalize(df):
             df_scaled[column] = (df_scaled[column] - df_scaled[column].min()) / (
                         df_scaled[column].max() - df_scaled[column].min())
     return df_scaled
+
 
 
 if __name__ == '__main__':
