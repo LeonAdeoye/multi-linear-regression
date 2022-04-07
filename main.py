@@ -2,8 +2,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
 
 insurance_dataFrame = pd.read_csv("insurance.csv", sep=',')
+# Pandas has the Options configuration, which you can use to change the number of columns displayed with head()
 pd.set_option('display.max_columns', None)
 
 
@@ -61,15 +63,30 @@ def dummy_coding():
 
     for x in insurance_dataFrame.index:
         if insurance_dataFrame.loc[x, "region"] == "northwest":
-            insurance_dataFrame.loc[x, "region"] = 1
+            insurance_dataFrame.loc[x, "region"] = 0
         elif insurance_dataFrame.loc[x, "region"] == "southwest":
-            insurance_dataFrame.loc[x, "region"] = 2
+            insurance_dataFrame.loc[x, "region"] = 1
         elif insurance_dataFrame.loc[x, "region"] == "southeast":
-            insurance_dataFrame.loc[x, "region"] = 3
+            insurance_dataFrame.loc[x, "region"] = 2
         elif insurance_dataFrame.loc[x, "region"] == "northeast":
-            insurance_dataFrame.loc[x, "region"] = 4
+            insurance_dataFrame.loc[x, "region"] = 3
 
     print(f"Head after dummy coding:\n{insurance_dataFrame.head(20)}")
+
+
+def model_improvement():
+    age = np.array(insurance_dataFrame["age"]).reshape((-1, 1))
+    print(age)
+    age_ = PolynomialFeatures(degree=2, include_bias=False).fit_transform(age)
+    print(age_[:, 1])
+    insurance_dataFrame["age_2"] = age_[:, 1]
+    print(insurance_dataFrame.columns)
+    print(insurance_dataFrame.head)
+    # TODO
+    # bmi30
+    # age2
+    # interaction
+    # use float: https://stackoverflow.com/questions/29849445/convert-scientific-notation-to-decimals
 
 
 def charting():
@@ -112,8 +129,8 @@ def normalize(df):
 def model_data():
     model = LinearRegression()
     model.fit(insurance_dataFrame[["age", "sex", "bmi", "children", "smoker", "region", "northeast", "southeast", "southwest", "northwest"]], insurance_dataFrame["charges"])
-    print('intercept:', model.intercept_)
-    print('slope:', model.coef_)
+    print('intercept:', round(model.intercept_))
+    print('slope:', np.round_(model.coef_, decimals=2))
     print(insurance_dataFrame.columns)
 
 
@@ -194,6 +211,7 @@ if __name__ == '__main__':
     read_data()
     # charting()
     dummy_coding()
+    model_improvement()
     model_data()
     # linear_regression_simple_example()
     # multivariate_linear_regression_example()
