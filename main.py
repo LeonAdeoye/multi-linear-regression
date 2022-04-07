@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 
 insurance_dataFrame = pd.read_csv("insurance.csv", sep=',')
+pd.set_option('display.max_columns', None)
 
 
 def read_data():
@@ -19,6 +20,59 @@ def read_data():
     # Another way to get a count per region:
     print(f"Another way to get a count per region => insurance_dataFrame['region'].value_counts() =\n {insurance_dataFrame['region'].value_counts()}")
 
+
+# Explicit dummy coding needs to be applied.
+def dummy_coding():
+    for x in insurance_dataFrame.index:
+        if insurance_dataFrame.loc[x, "sex"] == "female":
+            insurance_dataFrame.loc[x, "sex"] = 0
+        else:
+            insurance_dataFrame.loc[x, "sex"] = 1
+
+    for x in insurance_dataFrame.index:
+        if insurance_dataFrame.loc[x, "smoker"] == "yes":
+            insurance_dataFrame.loc[x, "smoker"] = 1
+        else:
+            insurance_dataFrame.loc[x, "smoker"] = 0
+
+    for x in insurance_dataFrame.index:
+        if insurance_dataFrame.loc[x, "region"] == "northeast":
+            insurance_dataFrame.loc[x, "northeast"] = 1
+        else:
+            insurance_dataFrame.loc[x, "northeast"] = 0
+
+    for x in insurance_dataFrame.index:
+        if insurance_dataFrame.loc[x, "region"] == "southeast":
+            insurance_dataFrame.loc[x, "southeast"] = 1
+        else:
+            insurance_dataFrame.loc[x, "southeast"] = 0
+
+    for x in insurance_dataFrame.index:
+        if insurance_dataFrame.loc[x, "region"] == "southwest":
+            insurance_dataFrame.loc[x, "southwest"] = 1
+        else:
+            insurance_dataFrame.loc[x, "southwest"] = 0
+
+    for x in insurance_dataFrame.index:
+        if insurance_dataFrame.loc[x, "region"] == "northwest":
+            insurance_dataFrame.loc[x, "northwest"] = 1
+        else:
+            insurance_dataFrame.loc[x, "northwest"] = 0
+
+    for x in insurance_dataFrame.index:
+        if insurance_dataFrame.loc[x, "region"] == "northwest":
+            insurance_dataFrame.loc[x, "region"] = 1
+        elif insurance_dataFrame.loc[x, "region"] == "southwest":
+            insurance_dataFrame.loc[x, "region"] = 2
+        elif insurance_dataFrame.loc[x, "region"] == "southeast":
+            insurance_dataFrame.loc[x, "region"] = 3
+        elif insurance_dataFrame.loc[x, "region"] == "northeast":
+            insurance_dataFrame.loc[x, "region"] = 4
+
+    print(f"Head after dummy coding:\n{insurance_dataFrame.head(20)}")
+
+
+def charting():
     # Display histogram of charges
     # Because the mean value is higher than the median value, this implies that the distribution of the insurance charges is skewed to the higher charge value (right skewed).
     insurance_dataFrame["charges"].hist(bins=13, legend=True)
@@ -57,6 +111,10 @@ def normalize(df):
 
 def model_data():
     model = LinearRegression()
+    model.fit(insurance_dataFrame[["age", "sex", "bmi", "children", "smoker", "region", "northeast", "southeast", "southwest", "northwest"]], insurance_dataFrame["charges"])
+    print('intercept:', model.intercept_)
+    print('slope:', model.coef_)
+    print(insurance_dataFrame.columns)
 
 
 def linear_regression_simple_example():
@@ -134,6 +192,8 @@ def multivariate_linear_regression_example():
 
 if __name__ == '__main__':
     read_data()
+    # charting()
+    dummy_coding()
     model_data()
-    linear_regression_simple_example()
-    multivariate_linear_regression_example()
+    # linear_regression_simple_example()
+    # multivariate_linear_regression_example()
