@@ -71,20 +71,27 @@ def dummy_coding():
         elif insurance_dataFrame.loc[x, "region"] == "northeast":
             insurance_dataFrame.loc[x, "region"] = 3
 
+    # BMI may have zero impact on medical expenses for individuals in the normal weight range, but it may be
+    # strongly related to higher costs for the obese (BMI of 30 or above). We can model this relationship by
+    # creating a binary obesity indicator variable that is 1 if the BMI is at least 30, and 0 if less.
+    for x in insurance_dataFrame.index:
+        if insurance_dataFrame.loc[x, "bmi"] >= 30:
+            insurance_dataFrame.loc[x, "bmi30"] = 1
+        else:
+            insurance_dataFrame.loc[x, "bmi30"] = 0
+
     print(f"Head after dummy coding:\n{insurance_dataFrame.head(20)}")
 
 
 def model_improvement():
     age = np.array(insurance_dataFrame["age"]).reshape((-1, 1))
     print(age)
-    age_ = PolynomialFeatures(degree=2, include_bias=False).fit_transform(age)
-    print(age_[:, 1])
-    insurance_dataFrame["age_2"] = age_[:, 1]
+    age_2 = PolynomialFeatures(degree=2, include_bias=False).fit_transform(age)
+    print(age_2[:, 1])
+    insurance_dataFrame["age_2"] = age_2[:, 1]
     print(insurance_dataFrame.columns)
     print(insurance_dataFrame.head)
     # TODO
-    # bmi30
-    # age2
     # interaction
     # use float: https://stackoverflow.com/questions/29849445/convert-scientific-notation-to-decimals
 
@@ -128,9 +135,14 @@ def normalize(df):
 
 def model_data():
     model = LinearRegression()
-    model.fit(insurance_dataFrame[["age", "sex", "bmi", "children", "smoker", "region", "northeast", "southeast", "southwest", "northwest"]], insurance_dataFrame["charges"])
+    # When a dummy variable is to a regression model, one category is always left out to serve as the reference category.
+    # In this case we have four dummy variables for region, and I left out northeast.
+    model.fit(insurance_dataFrame[["age", "age_2", "sex", "bmi", "bmi30", "children", "smoker", "southeast", "southwest", "northwest"]], insurance_dataFrame["charges"])
     print('intercept:', round(model.intercept_))
     print('slope:', np.round_(model.coef_, decimals=2))
+    # Expected values are:
+    # intercept: -11939
+    # slope: [  256.86  -131.31   339.19   475.5  23848.53 -1035.02  -960.05  -352.96]
     print(insurance_dataFrame.columns)
 
 
