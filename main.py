@@ -71,15 +71,6 @@ def dummy_coding():
         elif insurance_dataFrame.loc[x, "region"] == "northeast":
             insurance_dataFrame.loc[x, "region"] = 3
 
-    # BMI may have zero impact on medical expenses for individuals in the normal weight range, but it may be
-    # strongly related to higher costs for the obese (BMI of 30 or above). We can model this relationship by
-    # creating a binary obesity indicator variable that is 1 if the BMI is at least 30, and 0 if less.
-    for x in insurance_dataFrame.index:
-        if insurance_dataFrame.loc[x, "bmi"] >= 30:
-            insurance_dataFrame.loc[x, "bmi30"] = 1
-        else:
-            insurance_dataFrame.loc[x, "bmi30"] = 0
-
     print(f"Head after dummy coding:\n{insurance_dataFrame.head(20)}")
 
 
@@ -91,6 +82,16 @@ def model_improvement():
     insurance_dataFrame["age_2"] = age_2[:, 1]
     print(insurance_dataFrame.columns)
     print(insurance_dataFrame.head)
+
+    # BMI may have zero impact on medical expenses for individuals in the normal weight range, but it may be
+    # strongly related to higher costs for the obese (BMI of 30 or above). We can model this relationship by
+    # creating a binary obesity indicator variable that is 1 if the BMI is at least 30, and 0 if less.
+    for x in insurance_dataFrame.index:
+        if insurance_dataFrame.loc[x, "bmi"] >= 30:
+            insurance_dataFrame.loc[x, "bmi30"] = 1
+        else:
+            insurance_dataFrame.loc[x, "bmi30"] = 0
+
     # TODO
     # interaction
     # use float: https://stackoverflow.com/questions/29849445/convert-scientific-notation-to-decimals
